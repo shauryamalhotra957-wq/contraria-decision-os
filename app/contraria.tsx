@@ -155,6 +155,8 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
   const [ledger, setLedger] = useState<AuditEvent[]>([]);
   const [toast, setToast] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+  const searchReturnFocusRef = useRef<HTMLElement | null>(null);
+  const searchWasOpenRef = useRef(false);
 
   const notify = useCallback((message: string) => {
     setToast(message);
@@ -193,6 +195,48 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    if (searchOpen) {
+      searchReturnFocusRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+      searchWasOpenRef.current = true;
+      const frame = window.requestAnimationFrame(() => {
+        document.querySelector<HTMLButtonElement>(".search-drawer > header button")?.focus();
+      });
+      const trapFocus = (event: KeyboardEvent) => {
+        if (event.key !== "Tab") return;
+        const drawer = document.querySelector<HTMLElement>(".search-drawer");
+        if (!drawer) return;
+        const focusable = Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'button, a[href], input, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => !element.hasAttribute("disabled"));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+      document.addEventListener("keydown", trapFocus);
+      return () => {
+        window.cancelAnimationFrame(frame);
+        document.removeEventListener("keydown", trapFocus);
+      };
+    }
+    if (searchWasOpenRef.current) {
+      searchWasOpenRef.current = false;
+      const frame = window.requestAnimationFrame(() => searchReturnFocusRef.current?.focus());
+      return () => window.cancelAnimationFrame(frame);
+    }
+  }, [searchOpen]);
+
   const activeHypothesis = hypotheses.find((item) => item.id === selectedHypothesis) ?? hypotheses[0];
   const activeEvidence = evidence.find((item) => item.id === selectedEvidence) ?? evidence[0];
   const supportCount = evidence.filter((item) => item.stance === "support").length;
@@ -214,15 +258,24 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
     }
   }, [controls, notify, writeLedger]);
 
-  const search = async (event: FormEvent) => {
-    event.preventDefault();
-    if (query.trim().length < 2) return;
+  const search = async (event?: FormEvent) => {
+    event?.preventDefault();
+    if (query.trim().length < 2) {
+      notify("Enter at least two characters");
+      searchRef.current?.focus();
+      return;
+    }
     setSearching(true);
     setSearchOpen(true);
     try {
       const response = await fetch("/api/search", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ query, limit: 6 }) });
+      if (!response.ok) throw new Error("Search failed");
       const payload = await response.json() as { results: SearchResult[] };
       setSearchResults(payload.results ?? []);
+    } catch {
+      setSearchResults([]);
+      setSearchOpen(false);
+      notify("The evidence index did not respond");
     } finally { setSearching(false); }
   };
 
@@ -258,7 +311,17 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
       <aside className="rail">
         <button className="brand" aria-label="CONTRARIA home" onClick={() => setView("decision")}><span>C</span><i /></button>
         <nav aria-label="Decision workspace">
-          {nav.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => setView(item.id)} title={`${item.label} · ${item.hint}`}><b>{item.glyph}</b><span>{item.label}</span><kbd>{item.hint}</kbd></button>)}
+          {nav.map((item) => (
+            <button
+              key={item.id}
+              className={view === item.id ? "active" : ""}
+              onClick={() => setView(item.id)}
+              title={`${item.label} · ${item.hint}`}
+              aria-current={view === item.id ? "page" : undefined}
+            >
+              <b>{item.glyph}</b><span>{item.label}</span><kbd>{item.hint}</kbd>
+            </button>
+          ))}
         </nav>
         <div className="rail-status"><i /><span>LIVE</span></div>
         <button className="avatar" title="Workspace operator">SM</button>
