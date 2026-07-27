@@ -3,7 +3,7 @@
 > The decision-intelligence operating system that tries to prove you wrong before reality does.
 
 ![CONTRARIA — adversarial decision intelligence](./public/og.png)
-
+ 
 CONTRARIA turns fragmented evidence into an inspectable decision: supporting claims, counterevidence, contradictions, uncertainty, simulated outcomes, explicit launch gates, and an append-only audit trail. The included NovaCell workspace asks whether a fictional energy-storage company should enter Germany in Q1 2027. It is a complete, executable reference product—not a static dashboard.
 
 [![CI](https://github.com/shauryamalhotra957-wq/contraria-decision-os/actions/workflows/ci.yml/badge.svg)](https://github.com/shauryamalhotra957-wq/contraria-decision-os/actions/workflows/ci.yml)
