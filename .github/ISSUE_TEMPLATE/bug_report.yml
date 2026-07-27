@@ -16,7 +16,7 @@ body:
       label: Expected behavior
     validations:
       required: true
-  - type: textarea
+  - type: textarea   
     id: reproduction
     attributes:
       label: Reproduction
