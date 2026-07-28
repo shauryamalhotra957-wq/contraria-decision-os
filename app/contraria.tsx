@@ -184,10 +184,13 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
         event.preventDefault();
         searchRef.current?.focus();
       }
+      if (event.key === "Escape") {
+        setSearchOpen(false);
+        return;
+      }
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
       const target = nav[Number(event.key) - 1];
       if (target) setView(target.id);
-      if (event.key === "Escape") setSearchOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -258,7 +261,7 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
       <aside className="rail">
         <button className="brand" aria-label="CONTRARIA home" onClick={() => setView("decision")}><span>C</span><i /></button>
         <nav aria-label="Decision workspace">
-          {nav.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => setView(item.id)} title={`${item.label} · ${item.hint}`}><b>{item.glyph}</b><span>{item.label}</span><kbd>{item.hint}</kbd></button>)}
+          {nav.map((item) => <button key={item.id} className={view === item.id ? "active" : ""} aria-current={view === item.id ? "page" : undefined} onClick={() => setView(item.id)} title={`${item.label} · ${item.hint}`}><b>{item.glyph}</b><span>{item.label}</span><kbd>{item.hint}</kbd></button>)}
         </nav>
         <div className="rail-status"><i /><span>LIVE</span></div>
         <button className="avatar" title="Workspace operator">SM</button>
@@ -275,7 +278,14 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
 
         <main>
           <div className="decision-header">
-            <div><div className="eyebrow"><span>ACTIVE DECISION</span><i /> MODEL v0.9.3 <i /> UPDATED 18 JUL</div><h1>{decision.title}</h1></div>
+            <div className="decision-heading">
+              <div className="eyebrow"><span>ACTIVE DECISION</span><i /> MODEL v0.9.3 <i /> UPDATED 18 JUL</div>
+              <h1>{decision.title}</h1>
+              <div className="mobile-decision-actions" aria-label="Decision actions">
+                <button onClick={copyBrief}>COPY REVIEW</button>
+                <button onClick={exportMemo}>EXPORT MEMO</button>
+              </div>
+            </div>
             <div className="decision-meta"><span>OWNER<strong>{decision.owner}</strong></span><span>DECISION DATE<strong>{decision.deadline}</strong></span><span>CAPITAL AT RISK<strong>{decision.capitalAtRisk}</strong></span></div>
           </div>
 
