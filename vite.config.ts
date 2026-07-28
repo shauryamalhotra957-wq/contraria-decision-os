@@ -22,7 +22,7 @@ const localBindingConfig = {
           database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
         },
       ]
-    : [],
+    : [], 
   r2_buckets: r2
     ? [
         {
