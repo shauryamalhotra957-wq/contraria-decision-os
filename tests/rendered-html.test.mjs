@@ -23,6 +23,8 @@ test("server-renders the complete CONTRARIA decision room", async () => {
   assert.match(html, /WHAT WOULD PROVE US WRONG\?/);
   assert.match(html, /SCENARIO FRONTIER/);
   assert.match(html, /Interrogate all evidence/);
+  assert.match(html, /aria-label="Decision actions"/);
+  assert.match(html, /aria-current="page"/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
