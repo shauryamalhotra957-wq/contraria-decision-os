@@ -7,9 +7,8 @@ CREATE TABLE `audit_events` (
 	`checksum` text NOT NULL,
 	`created_at` text NOT NULL
 );
---> statement-breakpoint
-CREATE INDEX `audit_decision_idx` ON `audit_events` (`decision_id`);--> statement-breakpoint
-CREATE INDEX `audit_created_idx` ON `audit_events` (`created_at`);--> statement-breakpoint
+CREATE INDEX `audit_decision_idx` ON `audit_events` (`decision_id`);
+CREATE INDEX `audit_created_idx` ON `audit_events` (`created_at`);
 CREATE TABLE `decisions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,
@@ -19,7 +18,6 @@ CREATE TABLE `decisions` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
---> statement-breakpoint
 CREATE TABLE `evidence` (
 	`id` text PRIMARY KEY NOT NULL,
 	`decision_id` text NOT NULL,
@@ -32,9 +30,8 @@ CREATE TABLE `evidence` (
 	`observed_at` text NOT NULL,
 	`tags` text NOT NULL
 );
---> statement-breakpoint
-CREATE INDEX `evidence_decision_idx` ON `evidence` (`decision_id`);--> statement-breakpoint
-CREATE INDEX `evidence_stance_idx` ON `evidence` (`stance`);--> statement-breakpoint
+CREATE INDEX `evidence_decision_idx` ON `evidence` (`decision_id`);
+CREATE INDEX `evidence_stance_idx` ON `evidence` (`stance`);
 CREATE TABLE `scenarios` (
 	`id` text PRIMARY KEY NOT NULL,
 	`decision_id` text NOT NULL,
@@ -45,5 +42,4 @@ CREATE TABLE `scenarios` (
 	`survival_probability` real NOT NULL,
 	`created_at` text NOT NULL
 );
---> statement-breakpoint
 CREATE INDEX `scenarios_decision_idx` ON `scenarios` (`decision_id`);

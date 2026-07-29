@@ -167,7 +167,7 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
       if (!response.ok) return;
       const payload = await response.json() as { event: AuditEvent };
       setLedger((current) => [payload.event, ...current]);
-    } catch { /* Non-blocking audit sync. */ }
+    } catch {   }
   }, []);
 
   useEffect(() => {
@@ -175,7 +175,7 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
     fetch("/api/ledger")
       .then((response) => response.ok ? response.json() : Promise.reject(new Error("Ledger unavailable")))
       .then((payload: { events: AuditEvent[] }) => { if (active) setLedger(payload.events); })
-      .catch(() => { /* The core product remains useful while persistence reconnects. */ });
+      .catch(() => {   });
     return () => { active = false; };
   }, []);
   useEffect(() => {
