@@ -173,8 +173,11 @@ export function Contraria({ decision, evidence, hypotheses, contradictions, base
   useEffect(() => {
     let active = true;
     fetch("/api/ledger")
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Ledger unavailable")))
-      .then((payload: { events: AuditEvent[] }) => { if (active) setLedger(payload.events); })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Ledger unavailable");
+        const payload = await response.json() as { events: AuditEvent[] };
+        if (active) setLedger(payload.events);
+      })
       .catch(() => { /* The core product remains useful while persistence reconnects. */ });
     return () => { active = false; };
   }, []);
