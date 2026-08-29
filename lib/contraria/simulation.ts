@@ -5,6 +5,11 @@ function clamp(value: number, minimum: number, maximum: number) {
   return Math.max(minimum, Math.min(maximum, value));
 }
 
+function controlValue(value: unknown, fallback: number, minimum: number, maximum: number) {
+  const numeric = typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  return clamp(numeric, minimum, maximum);
+}
+
 function rng(seed: number) {
   let state = seed >>> 0;
   return () => {
@@ -49,11 +54,11 @@ function correlation(left: number[], right: number[]) {
 
 export function normalizeControls(input: Partial<SimulationControls>): SimulationControls {
   return {
-    marketGrowth: clamp(Number(input.marketGrowth ?? baselineControls.marketGrowth), 4, 42),
-    pricePremium: clamp(Number(input.pricePremium ?? baselineControls.pricePremium), -5, 28),
-    manufacturingYield: clamp(Number(input.manufacturingYield ?? baselineControls.manufacturingYield), 65, 94),
-    pilotConversion: clamp(Number(input.pilotConversion ?? baselineControls.pilotConversion), 25, 90),
-    regulatoryDelay: clamp(Number(input.regulatoryDelay ?? baselineControls.regulatoryDelay), 0, 18),
+    marketGrowth: controlValue(input.marketGrowth, baselineControls.marketGrowth, 4, 42),
+    pricePremium: controlValue(input.pricePremium, baselineControls.pricePremium, -5, 28),
+    manufacturingYield: controlValue(input.manufacturingYield, baselineControls.manufacturingYield, 65, 94),
+    pilotConversion: controlValue(input.pilotConversion, baselineControls.pilotConversion, 25, 90),
+    regulatoryDelay: controlValue(input.regulatoryDelay, baselineControls.regulatoryDelay, 0, 18),
   };
 }
 
