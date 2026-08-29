@@ -120,3 +120,7 @@ public/og.png          purpose-built social preview
 ## License
 
 MIT © 2026. See [LICENSE](./LICENSE).
+
+## API safety notes
+
+Search results are limited to 1–12 items and simulation runs to 1,000–50,000 iterations. Non-finite controls fall back to the documented baseline values, and API failures use stable public messages rather than returning runtime exception details. Boundary regressions are covered under `tests/*inputs.test.ts`.
