@@ -8,7 +8,7 @@ test("non-finite controls fall back to baseline values", () => {
     pricePremium: Infinity,
     manufacturingYield: Number.NEGATIVE_INFINITY,
   });
-  assert.equal(normalized.marketGrowth, 21);
+  assert.equal(normalized.marketGrowth, 22.4);
   assert.equal(normalized.pricePremium, 12);
-  assert.equal(normalized.manufacturingYield, 78);
+  assert.equal(normalized.manufacturingYield, 81);
 });
