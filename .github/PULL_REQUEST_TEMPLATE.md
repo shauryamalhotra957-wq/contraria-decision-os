@@ -1,21 +1,7 @@
-## Change
+﻿## Summary of Changes
+- Briefly describe the purpose and scope of this pull request.
 
-Describe the decision-system behavior changed by this pull request.
-
-## Why
-
-Explain the evidence, defect, or product requirement that motivated it.
-
-## Trust impact
-
-- [ ] Evidence provenance remains attributable.
-- [ ] Assumption or model changes are documented.
-- [ ] Audit behavior is preserved.
-- [ ] Synthetic data remains clearly identified.
-
-## Validation
-
-- [ ] `pnpm lint`
-- [ ] `pnpm test`
-- [ ] `pnpm build`
-- [ ] `pnpm test:render`
+## Checklist
+- [ ] Tests pass locally
+- [ ] Code conforms to repository formatting standards
+- [ ] Documentation updated if needed
