@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  contraria-decision-os:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=production
+    command: node --test tests/resilienceEngine.test.mjs
