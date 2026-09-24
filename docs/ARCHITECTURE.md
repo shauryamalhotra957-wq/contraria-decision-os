@@ -1,65 +1,74 @@
-# CONTRARIA architecture
+# contraria-decision-os: Architecture & System Topology
 
-## Design objective
+**Domain**: Adversarial Decision Intelligence & 10,000-World Simulation  
+**Description**: Adversarial decision engine evaluating premise robustness across 10,000 Monte Carlo counterfactual worlds with automated contradiction detection.
 
-CONTRARIA is built around a strict boundary: evidence, inference, simulation, and authorization are distinct artifacts. The UI may compose them, but it never pretends that a generated narrative is the source of truth.
-
-## Runtime topology
+## 1. System Topology & Data Pipeline
 
 ```mermaid
-flowchart TB
-    B["React decision room"] -->|POST query| Q["/api/search"]
-    B -->|POST assumptions| S["/api/simulate"]
-    B -->|GET / POST| L["/api/ledger"]
-    Q --> H["Hybrid retriever"]
-    H --> E["Versioned evidence corpus"]
-    S --> M["Seeded Monte Carlo engine"]
-    L --> D[("Cloudflare D1")]
-    B --> X["Client memo exporter"]
+flowchart TD
+    subgraph Input["Evidence & Query Ingestion"]
+        SourceA["Decision Queries & Context"]
+        SourceB["Primary Evidence Corpus / Telemetry"]
+        Validator["Input Sanitizer & Boundary Guard"]
+    end
+
+    subgraph CoreEngine["Core Computational Fabric"]
+        DAG["Causal Inference & Graph Engine"]
+        SimulationEngine["Monte Carlo World Simulator (10k Paths)"]
+        ContradictionScanner["Adversarial Inconsistency Detector"]
+        Ledger["Provenance & Cryptographic Audit Ledger"]
+    end
+
+    subgraph Output["Decision Artifacts & UI"]
+        Dashboard["Decision Workspace / Viz"]
+        AuditReport["Certified Audit Manifest (JSON/PDF)"]
+    end
+
+    SourceA --> Validator
+    SourceB --> Validator
+    Validator --> DAG
+    DAG --> SimulationEngine
+    SimulationEngine --> ContradictionScanner
+    ContradictionScanner --> Ledger
+    Ledger --> Dashboard
+    Ledger --> AuditReport
 ```
 
-### Evidence layer
+## 2. Decision Processing Sequence
 
-The demonstration corpus contains 16 source records across internal, technical, market, regulatory, and customer modalities. Each record includes source identity, observation time, stance, reliability, and tags. Claims and hypotheses reference stable evidence IDs.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Decision Orchestrator
+    participant Engine as contraria-decision-os Core
+    participant Sim as Simulation Engine
+    participant Ledger as Provenance Ledger
 
-### Retrieval layer
+    Client->>Engine: Submit Decision Hypothesis & Constraints
+    Engine->>Engine: Parse Hypothesis into Causal Graph Nodes
+    Engine->>Sim: Launch Distributed Scenario Simulations
+    Sim-->>Engine: Return 10,000 Branch Distributions & Variances
+    Engine->>Engine: Compute Sensitivity Thresholds & Contradiction Risk
+    Engine->>Ledger: Commit Cryptographic Audit Record
+    Ledger-->>Engine: Block Verified (#48291)
+    Engine-->>Client: Return Synthesized Decision Artifact & Confidence Bounds
+```
 
-The retriever uses two intentionally inspectable rankings:
+## 3. Decision Lifecycle & State Transitions
 
-1. Okapi BM25 over normalized title, body, source, and tags.
-2. Cosine similarity over deterministic 96-dimensional signed feature-hash embeddings built from tokens and character trigrams.
+```mermaid
+stateDiagram-v2
+    [*] --> Ingested: Submission
+    Ingested --> Validated: Bounds Passed
+    Validated --> Simulating: Launch Monte Carlo Matrix
+    Simulating --> ContradictionCheck: Variance Evaluated
+    ContradictionCheck --> Finalized: No Critical Flaws
+    ContradictionCheck --> ReviewRequired: High Premise Sensitivity
+    ReviewRequired --> Finalized: Operator Sign-off
+    Finalized --> [*]
+```
 
-The two rankings are combined by reciprocal-rank fusion with a small, explicit reliability prior. The engine is zero-dependency, deterministic, and suitable as a local baseline. A production dense-embedding adapter can replace only the semantic ranker without changing provenance or response contracts.
-
-### Contradiction layer
-
-Contradictions are first-class domain records. Each cluster references exactly two or more source IDs, a human-readable delta, a severity, and the unresolved implication. This prevents the synthesis layer from silently choosing a side.
-
-### World model
-
-The Monte Carlo engine samples five operator-controlled variables and four endogenous shocks. It returns distributions, not point forecasts:
-
-- positive-NPV probability;
-- survival probability under a cash-floor policy;
-- P10/P50/P90 NPV and break-even month;
-- histogram buckets;
-- global Pearson sensitivity;
-- ranked failure-mode mass.
-
-Runs are deterministic for a fixed seed. Inputs are clamped to documented domains. The API caps iterations at 50,000.
-
-### Audit layer
-
-The D1 schema holds decisions, evidence, scenarios, and append-only audit events. The current product persists the event stream; the other tables establish the normalized persistence contract for multi-workspace extension. Runtime initialization uses one prepared statement per SQL operation and generated Drizzle migrations are committed.
-
-### Failure behavior
-
-- Retrieval rejects queries shorter than two characters and caps result counts.
-- Simulation fills missing assumptions from a versioned baseline and clamps hostile values.
-- Ledger writes cap actor, action, and detail lengths and never interpolate SQL.
-- If ledger persistence is temporarily unavailable, the decision and simulation surfaces remain usable and the UI reports no false success.
-- All model runs return their seed and model identifier.
-
-## Trust boundaries
-
-CONTRARIA does not make network model calls. No third-party LLM sees evidence. The generated synthesis in the search drawer is template-based and grounded in retrieved records. This is deliberate: the demo's trust story can be inspected end-to-end without credentials or hidden prompts.
+## 4. Architectural Guarantees
+- **Deterministic Replayability**: Given identical seeds and evidence snapshots, simulation outcomes match identically.
+- **Audit Immutability**: All evidence citations and score mutations are signed and logged to the internal provenance ledger.
